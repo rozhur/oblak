@@ -55,20 +55,25 @@ public final class CraftBukkitReflection {
         final String pkg = serverClass.getPackage().getName();
         final String nmsVersion = pkg.substring(pkg.lastIndexOf(".") + 1);
         if (!nmsVersion.contains("_")) {
-            int fallbackVersion = -1;
+            int fallbackVersion;
             try {
                 final Method getMinecraftVersion = serverClass.getDeclaredMethod("getMinecraftVersion");
                 fallbackVersion = Integer.parseInt(getMinecraftVersion.invoke(Bukkit.getServer()).toString().split("\\.")[1]);
             } catch (final Exception ignored) {
+                String version = Bukkit.getVersion();
+                version = version.substring(version.indexOf("(MC: ") + 5, version.length() - 1);
+                String[] versionParts = version.split("\\.");
+                fallbackVersion = Integer.parseInt(versionParts[1]);
             }
+            String name = serverClass.getName();
+            name = name.substring(PREFIX_CRAFTBUKKIT.length());
+            name = name.substring(0, name.length() - CRAFT_SERVER.length());
+            CB_PKG_VERSION = name;
             MAJOR_REVISION = fallbackVersion;
         } else {
             MAJOR_REVISION = Integer.parseInt(nmsVersion.split("_")[1]);
+            CB_PKG_VERSION = "";
         }
-        String name = serverClass.getName();
-        name = name.substring(PREFIX_CRAFTBUKKIT.length());
-        name = name.substring(0, name.length() - CRAFT_SERVER.length());
-        CB_PKG_VERSION = name;
     }
 
     @SafeVarargs
