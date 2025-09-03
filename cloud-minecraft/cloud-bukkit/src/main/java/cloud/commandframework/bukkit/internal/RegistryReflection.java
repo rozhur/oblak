@@ -53,6 +53,7 @@ public final class RegistryReflection {
     );
     private static final Constructor<?> RESOURCE_LOCATION_CTR = CraftBukkitReflection.needConstructor(
             RESOURCE_LOCATION_CLASS,
+            String.class,
             String.class
     );
 
@@ -60,6 +61,8 @@ public final class RegistryReflection {
     }
 
     static {
+        RESOURCE_LOCATION_CTR.setAccessible(true);
+
         Class<?> registryClass;
         if (CraftBukkitReflection.MAJOR_REVISION < 17) {
             REGISTRY_REGISTRY = null;
@@ -122,7 +125,11 @@ public final class RegistryReflection {
 
     public static Object createResourceLocation(final String str) {
         try {
-            return RESOURCE_LOCATION_CTR.newInstance(str);
+            String[] parts = str.split(":", 2);
+            if (parts.length > 1) {
+                return RESOURCE_LOCATION_CTR.newInstance(parts[0], parts[1]);
+            }
+            return RESOURCE_LOCATION_CTR.newInstance("minecraft", parts[0]);
         } catch (final ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
