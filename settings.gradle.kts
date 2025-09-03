@@ -74,7 +74,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "cloud"
+rootProject.name = "oblak"
 
 include(":cloud-bom")
 
